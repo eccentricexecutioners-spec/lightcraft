@@ -26,6 +26,12 @@ pub fn shown(session: &lightcraft_engine::Session) -> bool {
 /// opens as left. The desktop host calls this before it notes what its settings file holds, so
 /// the switch isn't saved for its own sake.
 pub fn open_on_empty_library(app: &mut LightcraftApp) {
+    if crate::hidden::clean() {
+        // the clean screen opens on Detail, which asks for a photo
+        app.ui.view = ViewMode::Detail;
+        app.ui.left_panel = false;
+        return;
+    }
     if is_empty(&app.session) {
         if app.ui.view != ViewMode::SquareGrid {
             app.ui.view = ViewMode::PhotoGrid;
@@ -68,6 +74,25 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, rect: Rect) {
         actions,
         Some(&hint),
     );
+    if let Some(command) = clicked
+        && let Err(e) = app.run(command, json!({}))
+    {
+        app.toast_error(ui.ctx(), e);
+    }
+}
+
+const OPEN_PHOTO: EmptyAction = EmptyAction { command: "file.openPhoto", label: "Open Photo…", widget: "button:openPhoto" };
+const OPEN_FOLDER: EmptyAction = EmptyAction { command: "file.openFolder", label: "Open Folder…", widget: "button:openFolder" };
+
+/// The clean screen with no photo open: Open Photo… and Open Folder… centred in `rect`.
+pub fn open_prompt(app: &mut LightcraftApp, ui: &mut egui::Ui, rect: Rect) {
+    let mac = ui.ctx().os() == egui::os::OperatingSystem::Mac;
+    let drop = crate::i18n::tr("or drop a photo into this window");
+    let hint = match crate::hidden::open_photo_key("file.openPhoto", &app.ui.settings.keymap) {
+        Some(sc) => format!("{drop} · {}", crate::menubar::shortcut_text(sc, mac)),
+        None => drop.to_string(),
+    };
+    let clicked = super::empty_state(ui, rect, "Open a photo to start editing", "", &[OPEN_PHOTO, OPEN_FOLDER], Some(&hint));
     if let Some(command) = clicked
         && let Err(e) = app.run(command, json!({}))
     {

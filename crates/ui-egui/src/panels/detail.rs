@@ -130,7 +130,8 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
     let t = Tokens::get(ui.ctx());
     let full = ui.max_rect();
     let fullscreen = app.ui.fullscreen;
-    let show_film = app.ui.filmstrip && !fullscreen;
+    // the clean screen shows the folder strip only when there is more than one shot to flip between
+    let show_film = app.ui.filmstrip && !fullscreen && (crate::hidden::show_all() || app.session.visible().len() > 1);
     let film_h = if show_film { t.film_h } else { 0.0 };
     let canvas = Rect::from_min_max(full.min, pos2(full.right(), full.bottom() - film_h));
     app.canvas_rect = Some(canvas);
@@ -808,7 +809,9 @@ fn paint_badge(p: &egui::Painter, bg: Rect, g: std::sync::Arc<egui::Galley>) {
 
 /// No photo is active: the empty-library message if the library is empty, else "No photo selected".
 fn show_no_photo(app: &mut LightcraftApp, ui: &mut egui::Ui, canvas: Rect) {
-    if super::empty_library::shown(&app.session) {
+    if crate::hidden::clean() {
+        super::empty_library::open_prompt(app, ui, canvas);
+    } else if super::empty_library::shown(&app.session) {
         super::empty_library::show(app, ui, canvas);
     } else {
         super::empty_message(ui, canvas, "No photo selected", "Choose a photo in the grid or filmstrip");

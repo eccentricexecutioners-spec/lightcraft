@@ -139,6 +139,8 @@ fn main() -> eframe::Result {
     if let Some(result) = craft_update::self_update::finish(&craft_update::suite::LIGHTCRAFT, &std::env::args_os().skip(1).collect::<Vec<_>>()) {
         std::process::exit(i32::from(result.is_err()));
     }
+    // Panoptic: the clean screen (PANOPTIC_SHOW_ALL=1 brings the full app back)
+    lightcraft_ui_egui::hidden::enable_clean();
     // First, so every start-up record is kept for the log file (`logging`).
     let logger = logging::install();
     lightcraft_engine::guard::install_hook(panic_log_path_with(|name| std::env::var_os(name), std::env::temp_dir()));
@@ -148,7 +150,8 @@ fn main() -> eframe::Result {
     alloc_release::install();
     let mut control_port = control_port_from("LIGHTCRAFT_CONTROL_PORT", std::env::var("LIGHTCRAFT_CONTROL_PORT").ok().filter(|v| !v.is_empty()));
     let mut files = Vec::new();
-    let mut seed_demo = true;
+    // Panoptic's hidden library starts empty: no demo photos unless PANOPTIC_SHOW_ALL is set
+    let mut seed_demo = lightcraft_ui_egui::hidden::show_all();
     let mut in_memory = false;
     let mut library_dir: Option<std::path::PathBuf> = None;
     let mut args = std::env::args().skip(1);
@@ -225,7 +228,7 @@ fn main() -> eframe::Result {
     let opens_as = prefs.as_ref().and_then(|ui| ui.window).and_then(lightcraft_ui_egui::window_place::WindowPlace::checked);
     let options = eframe::NativeOptions {
         renderer,
-        viewport: as_remembered(egui::ViewportBuilder::default().with_title("LightCraft"), opens_as)
+        viewport: as_remembered(egui::ViewportBuilder::default().with_title(lightcraft_ui_egui::hidden::brand("LightCraft")), opens_as)
             .with_min_inner_size(lightcraft_ui_egui::window_place::MIN_SIZE)
             .with_drag_and_drop(true)
             .with_fullsize_content_view(true)
@@ -312,10 +315,20 @@ fn main() -> eframe::Result {
                     // listed and read on the import worker once the window shows (issue #374: never
                     // here, before the first frame, where a large folder kept the window from
                     // appearing)
-                    if let Err(e) = lightcraft_ui_egui::import::start_paths(&mut app, files) {
+                    // Panoptic: a file or folder on the command line opens straight in Detail
+                    let started = if lightcraft_ui_egui::hidden::clean() {
+                        lightcraft_ui_egui::import::open_paths(&mut app, files)
+                    } else {
+                        lightcraft_ui_egui::import::start_paths(&mut app, files)
+                    };
+                    if let Err(e) = started {
                         log::warn!("import at launch: {e}");
                     }
-                    app.ui.view = lightcraft_ui_egui::state::ViewMode::PhotoGrid;
+                    app.ui.view = if lightcraft_ui_egui::hidden::clean() {
+                        lightcraft_ui_egui::state::ViewMode::Detail
+                    } else {
+                        lightcraft_ui_egui::state::ViewMode::PhotoGrid
+                    };
                 }
                 // native menu bar generated from the command registry (macOS; elsewhere the menus are
                 // drawn in the window's top bar). LIGHTCRAFT_NO_NATIVE_MENU=1 keeps the in-window menus.

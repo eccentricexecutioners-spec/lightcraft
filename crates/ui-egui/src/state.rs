@@ -371,7 +371,7 @@ impl Default for UiState {
             right_width: RIGHT_WIDTH.default,
             right: RightPanel::Edit,
             right_hidden: RightPanel::None,
-            presets: false,
+            presets: crate::hidden::clean(),
             preset_thumbs: false,
             filmstrip: true,
             zoom: Zoom::Fit,

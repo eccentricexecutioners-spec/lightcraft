@@ -498,6 +498,9 @@ fn cull(app: &mut LightcraftApp, id: &str, mut params: serde_json::Value, advanc
 
 /// Run a fixed alias (a second key for a command).
 fn fire_alias(app: &mut LightcraftApp, ctx: &egui::Context, id: &str, params: serde_json::Value) {
+    if crate::hidden::command(id) {
+        return;
+    }
     // a slideshow: Space pauses / resumes
     if id == "view.zoomToggle" && app.ui.slideshow.is_some() {
         if let Ok(v) = app.run("slideshow.togglePause", json!({})) {
@@ -537,6 +540,11 @@ fn flag_toast(app: &mut LightcraftApp, ctx: &egui::Context, flag: lightcraft_cat
 
 /// Run one fired command.
 fn fire_command(app: &mut LightcraftApp, ctx: &egui::Context, f: &str, rotate_fires: bool) {
+    // the clean screen gives Open Library's key to Open Photo
+    let f = if crate::hidden::clean() && f == "app.openLibrary" { "file.openPhoto" } else { f };
+    if crate::hidden::command(f) {
+        return;
+    }
     // a slideshow: ←/→ step (a cut)
     if app.ui.slideshow.is_some() && matches!(f, "library.next" | "library.previous") {
         let _ = app.run(if f == "library.next" { "slideshow.next" } else { "slideshow.previous" }, json!({}));

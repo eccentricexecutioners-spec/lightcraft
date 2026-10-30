@@ -289,11 +289,11 @@ pub fn launch_plan(memory: bool, flag: Option<PathBuf>, env: Option<PathBuf>, se
     if let Some(dir) = flag.or(env) {
         return Launch::Open { dir: Some(dir), alt_asks: false };
     }
-    if settings.is_some_and(|s| s.at_launch == LaunchLibrary::Ask) {
+    if crate::hidden::show_all() && settings.is_some_and(|s| s.at_launch == LaunchLibrary::Ask) {
         return Launch::Ask;
     }
     let last = settings.map(|s| s.library_path.clone()).filter(|p| !p.is_empty()).map(PathBuf::from);
-    Launch::Open { dir: last.or(default), alt_asks: true }
+    Launch::Open { dir: last.or(default), alt_asks: crate::hidden::show_all() }
 }
 
 /// One library in the launch window's list.

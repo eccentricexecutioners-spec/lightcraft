@@ -52,8 +52,10 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
                 window_handle(ui, bar);
             }
             nav_buttons(app, ui, search_left);
-            search_field(app, ui, &t, sr);
-            filter_button(app, ui, &t, sr);
+            if crate::hidden::show_all() {
+                search_field(app, ui, &t, sr);
+                filter_button(app, ui, &t, sr);
+            }
             let x = right_icons(app, ui, &t, full);
             appearance_button(app, ui, &t, full, x);
         });
@@ -63,23 +65,46 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
 fn nav_buttons(app: &mut LightcraftApp, ui: &mut egui::Ui, search_left: f32) {
     ui.horizontal_centered(|ui| {
         ui.spacing_mut().item_spacing.x = 4.0;
-        if icon_button(ui, "sidebar", Icon::Sidebar, vec2(30.0, 30.0), app.ui.left_panel, true, crate::i18n::tr("Show/hide My Photos panel"))
-            .clicked()
-        {
-            let _ = app.run("view.leftPanel", json!({}));
+        if crate::hidden::show_all() {
+            if icon_button(ui, "sidebar", Icon::Sidebar, vec2(30.0, 30.0), app.ui.left_panel, true, crate::i18n::tr("Show/hide My Photos panel"))
+                .clicked()
+            {
+                let _ = app.run("view.leftPanel", json!({}));
+            }
+            ui.add_space(8.0);
+            if icon_button(ui, "back", Icon::Back, vec2(30.0, 30.0), false, true, crate::i18n::tr("Back")).clicked() {
+                let _ = app.run("view.back", json!({}));
+            }
+            icon_button(ui, "forward", Icon::Forward, vec2(30.0, 30.0), false, false, crate::i18n::tr("Forward"));
         }
-        ui.add_space(8.0);
-        if icon_button(ui, "back", Icon::Back, vec2(30.0, 30.0), false, true, crate::i18n::tr("Back")).clicked() {
-            let _ = app.run("view.back", json!({}));
-        }
-        icon_button(ui, "forward", Icon::Forward, vec2(30.0, 30.0), false, false, crate::i18n::tr("Forward"));
         if !app.native_menu {
             // no native menu bar (web, Windows, Linux): menus in the top bar
             ui.add_space(10.0);
             let room = search_left - ui.cursor().left() - 16.0;
             crate::menubar::show_in_window(app, ui, room);
         }
+        if crate::hidden::clean() {
+            clean_actions(app, ui);
+        }
     });
+}
+
+/// The clean screen's top bar: Open Photo, Before/After and Export.
+fn clean_actions(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+    ui.add_space(10.0);
+    let has_photo = app.session.active().is_some();
+    let run = |app: &mut LightcraftApp, ui: &mut egui::Ui, id: &str, widget: &str, label: &str, enabled: bool| {
+        let r = ui.add_enabled(enabled, egui::Button::new(crate::i18n::tr(label)));
+        register(ui, widget, r.rect);
+        if r.clicked()
+            && let Err(e) = app.run(id, json!({}))
+        {
+            app.toast_error(ui.ctx(), e);
+        }
+    };
+    run(app, ui, "file.openPhoto", "button:topOpenPhoto", "Open Photo", true);
+    run(app, ui, "view.beforeAfter", "button:topBeforeAfter", "Before/After", has_photo);
+    run(app, ui, "dialog.export", "button:topExport", "Export", has_photo);
 }
 
 /// The centred search field with its placeholder and focus ring.
@@ -179,6 +204,10 @@ fn right_icons(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, full: Rec
         ("import", Icon::Plus, import_tip.as_str(), "file.addPhotos"),
         ("bell", Icon::Bell, "Activity", "panel.activity"),
     ] {
+        // the clean screen keeps the keyboard-shortcuts help and nothing that points at a library or at ArtCraft
+        if crate::hidden::clean() && id != "help" {
+            continue;
+        }
         let r = Rect::from_center_size(pos2(x, full.center().y), vec2(28.0, 28.0));
         let resp = ui.interact(r, egui::Id::unique(("top", id)), Sense::click()).on_hover_text(crate::i18n::tr(tip));
         crate::widgets::announce(&resp, crate::i18n::tr(tip));

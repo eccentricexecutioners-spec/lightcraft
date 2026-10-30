@@ -38,6 +38,9 @@ pub struct ImportTask {
     pub cancelled: bool,
     /// Auto Import (the watched folder): the selection stays as it is, a short toast when done.
     auto: bool,
+    /// Open photo / Open folder: the first photo (or the one already in the library) opens in
+    /// Detail with the Edit panel, and the folder it is in becomes the view the strip flips through.
+    open: bool,
     /// Auto Import: the selection to keep.
     keep_selection: Option<lightcraft_engine::Selection>,
     /// The selection and source as the import last left them: a change between frames is the
@@ -265,6 +268,40 @@ pub fn start_paths(app: &mut LightcraftApp, paths: Vec<String>) -> Result<Value,
     Ok(json!({"importing": total}))
 }
 
+/// Open photo / Open folder: add `paths` to the library with the plain defaults (`mode: add`, no
+/// copy, no keywords, no album, no preset; the review dialog is skipped) and open the first photo
+/// in Detail. A file the library already holds opens its existing entry, so its edits come back.
+pub fn open_paths(app: &mut LightcraftApp, paths: Vec<String>) -> Result<Value, String> {
+    let first = paths.first().cloned();
+    let r = start_paths(app, paths)?;
+    if let Some(task) = app.import.as_mut() {
+        task.open = true;
+    }
+    Ok(json!({"opening": first, "importing": r["importing"]}))
+}
+
+/// The photo an Open ends on: the first one the import added, else the first the library already had.
+fn open_target(task: &ImportTask) -> Option<u64> {
+    task.first.or_else(|| task.existing.first().copied())
+}
+
+/// Show the opened photo in Detail with the Edit panel, in its folder.
+fn show_opened(app: &mut LightcraftApp, id: u64) {
+    let folder = app.session.catalog.photo(lightcraft_catalog::PhotoId(id)).and_then(|p| match &p.source {
+        lightcraft_engine::catalog::Source::File { path } => std::path::Path::new(path).parent().map(|d| d.to_string_lossy().into_owned()),
+        _ => None,
+    });
+    let in_folder = folder.is_some_and(|path| app.run("library.source", json!({"kind": "libraryFolder", "path": path})).is_ok());
+    if !in_folder {
+        let _ = app.run("library.source", json!({"kind": "all"}));
+    }
+    let _ = app.run("library.select", json!({"ids": [id]}));
+    app.ui.view = crate::state::ViewMode::Detail;
+    if app.ui.right == crate::state::RightPanel::None {
+        app.ui.right = crate::state::RightPanel::Edit;
+    }
+}
+
 /// Advance the import in progress (called every frame): start its worker, then add the batches it
 /// has readied to the catalog.
 pub fn tick(app: &mut LightcraftApp, ctx: &egui::Context) {
@@ -438,6 +475,14 @@ fn undo_label(task: &ImportTask) -> String {
 fn finish(app: &mut LightcraftApp, ctx: &egui::Context, task: ImportTask) {
     let steps = app.session.undo.len().saturating_sub(task.undo0);
     app.session.merge_undo(steps, &undo_label(&task));
+    if task.open
+        && !task.cancelled
+        && let Some(id) = open_target(&task)
+    {
+        show_opened(app, id);
+        quiet_finish(app, ctx, &task);
+        return;
+    }
     if task.auto || task.browse {
         quiet_finish(app, ctx, &task);
         return;

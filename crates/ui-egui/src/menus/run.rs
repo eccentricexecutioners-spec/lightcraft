@@ -1262,6 +1262,37 @@ fn ui_commands_10(app: &mut LightcraftApp, ctx: &egui::Context, id: &str, p: &Va
             let path = p.get("path").and_then(Value::as_str)?;
             crate::import::browse(app, path, p.get("subfolders").and_then(Value::as_bool))
         }
+        "file.openPhoto" => {
+            let paths: Vec<String> = match p.get("paths").and_then(Value::as_array) {
+                Some(a) => a.iter().filter_map(Value::as_str).map(str::to_string).collect(),
+                None => {
+                    let req = PickRequest::files(None, crate::i18n::tr("Photos"), lightcraft_engine::import::EXTENSIONS);
+                    match crate::pick::ask(app, id, p, "paths", req, |s| s.pick_files.as_mut().map(|f| f())) {
+                        Picked::Now(paths) => paths,
+                        Picked::Later | Picked::Unavailable => return Some(Ok(Value::Null)),
+                    }
+                }
+            };
+            if paths.is_empty() {
+                return Some(Ok(Value::Null));
+            }
+            crate::import::open_paths(app, paths)
+        }
+        "file.openFolder" => {
+            let path = match p.get("path").and_then(Value::as_str) {
+                Some(x) => Some(x.to_string()),
+                None => match crate::pick::ask(app, id, p, "path", PickRequest::folder(crate::i18n::tr("Open Folder…")), |s| {
+                    s.pick_folder.as_mut().and_then(|f| f()).map(|x| vec![x])
+                }) {
+                    Picked::Now(v) => v.into_iter().next(),
+                    Picked::Later | Picked::Unavailable => None,
+                },
+            };
+            match path {
+                Some(path) => crate::import::open_paths(app, vec![path]),
+                None => Ok(Value::Null),
+            }
+        }
         "file.addPhotos" => {
             if crate::lightroom_import::is_running(app) {
                 return Some(Err("finish Lightroom catalog import before adding photos".into()));
@@ -1460,6 +1491,7 @@ fn view_back_command(app: &mut LightcraftApp, ctx: &egui::Context) -> Result<Val
                 app.ui.view = ViewMode::People;
                 app.ui.person_page = name;
             }
+            _ if crate::hidden::clean() => {}
             _ => app.ui.view = ViewMode::PhotoGrid,
         }
     }

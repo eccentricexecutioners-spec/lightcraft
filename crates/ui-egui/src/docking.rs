@@ -38,7 +38,7 @@ impl Panel {
     }
     /// The dock the panel opens in when it has no recorded place.
     fn home_side(self) -> Side {
-        if self == Self::Library { Side::Start } else { Side::End }
+        if self == Self::Library || self == Self::Presets && crate::hidden::clean() { Side::Start } else { Side::End }
     }
     /// The width of the panel's own column in the default workspace.
     fn home_width(self) -> f32 {
@@ -92,6 +92,20 @@ fn column(panel: Panel, width: f32) -> Column<Panel> {
 /// its own on Tools' photo side rather than a group under Tools: both are tall lists that are
 /// read side by side while trying presets, and stacking them would halve both.
 fn docked(left: f32, right: f32) -> Workspace {
+    if crate::hidden::clean() {
+        // the clean screen: Presets left, the photo centre, Tools right
+        let start = Node::Dock { side: Side::Start, columns: vec![column(Panel::Presets, PRESETS_WIDTH)] };
+        let end = Node::Dock { side: Side::End, columns: vec![column(Panel::Tools, right)] };
+        return Workspace::new(Layout {
+            root: Some(split(
+                SplitAxis::Horizontal,
+                SplitSize::FixedFirst(PRESETS_WIDTH),
+                start,
+                split(SplitAxis::Horizontal, SplitSize::FixedSecond(right), tabs(Panel::Canvas), end),
+            )),
+            floating: Vec::new(),
+        });
+    }
     let start = Node::Dock { side: Side::Start, columns: vec![column(Panel::Library, left)] };
     let end = Node::Dock { side: Side::End, columns: vec![column(Panel::Tools, right), column(Panel::Presets, PRESETS_WIDTH)] };
     Workspace::new(Layout {
@@ -234,7 +248,7 @@ fn from_ui(app: &crate::LightcraftApp) -> Workspace {
 }
 
 fn sync(workspace: &mut Workspace, app: &crate::LightcraftApp) -> Result<(), String> {
-    set_visible(workspace, Panel::Library, app.ui.left_panel)?;
+    set_visible(workspace, Panel::Library, app.ui.left_panel && crate::hidden::show_all())?;
     set_visible(workspace, Panel::Tools, app.ui.right != crate::state::RightPanel::None)?;
     set_visible(workspace, Panel::Presets, app.ui.presets)
 }
@@ -417,7 +431,12 @@ pub fn show(app: &mut crate::LightcraftApp, ui: &mut egui::Ui) {
     );
     if let Some(mut canvas) = canvas {
         let ui = &mut canvas;
-        crate::panels::bottombar::show(app, ui);
+        if crate::hidden::show_all() {
+            crate::panels::bottombar::show(app, ui);
+        } else if app.ui.view != crate::state::ViewMode::Detail {
+            // the clean screen is one photo at a time; the library views stay hidden
+            app.ui.view = crate::state::ViewMode::Detail;
+        }
         let bg = if matches!(
             app.ui.view,
             crate::state::ViewMode::Detail | crate::state::ViewMode::Compare | crate::state::ViewMode::Survey | crate::state::ViewMode::Reference

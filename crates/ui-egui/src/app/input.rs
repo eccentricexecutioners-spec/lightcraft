@@ -101,7 +101,10 @@ impl LightcraftApp {
             self.toast(ctx, crate::i18n::tr("An import is running"));
             return;
         }
-        let started = if self.ui.settings.import_dropped_directly {
+        let started = if crate::hidden::clean() {
+            // the clean screen: a dropped photo opens straight in Detail
+            import::open_paths(self, photos).map(|_| ())
+        } else if self.ui.settings.import_dropped_directly {
             // read and added on a worker thread (dropped folders can be large, or on a slow drive)
             import::start_paths(self, photos).map(|_| ())
         } else {

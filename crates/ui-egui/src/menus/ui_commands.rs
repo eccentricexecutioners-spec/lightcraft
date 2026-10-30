@@ -221,6 +221,8 @@ pub const UI_COMMANDS: &[UiCommand] = &[
     ("merge.hdrLast", "HDR with Last Settings", Some("Ctrl+Shift+H"), "Photo>Photo Merge"),
     ("merge.panoramaLast", "Panorama with Last Settings", Some("Ctrl+Shift+M"), "Photo>Photo Merge"),
     ("merge.hdrPanoramaLast", "HDR Panorama with Last Settings", None, "Photo>Photo Merge"),
+    ("file.openPhoto", "Open Photo…", None, "File"),
+    ("file.openFolder", "Open Folder…", None, "File"),
     ("file.addPhotos", "Import Photos…", Some("Cmd+Shift+I"), "File"),
     ("file.addFolder", "Import from Folder…", None, "File"),
     // {path?, into?: open | new, name?, location?}: asks where the catalog goes unless `into` (or
