@@ -17,6 +17,7 @@ pub mod export_task;
 mod focus_scan;
 mod frame_rate;
 pub mod headless;
+pub mod hidden;
 pub mod i18n;
 pub mod icons;
 pub mod lightroom_import;
