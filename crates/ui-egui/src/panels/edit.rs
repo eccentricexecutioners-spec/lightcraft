@@ -252,21 +252,8 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
         if open {
             mixer(app, ui, d);
         }
-        if !crate::is_bw(d) {
-            let open = app.ui.flyout_open("pointColor");
-            if flyout_row(ui, "pointColor", crate::i18n::tr("Point Color"), Icon::Picker, open).clicked() {
-                app.ui.toggle_flyout("pointColor");
-            }
-            if open {
-                point_color(app, ui, d);
-            }
-        }
-        let open = app.ui.flyout_open("grading");
-        if flyout_row(ui, "grading", crate::i18n::tr("Color Grading"), Icon::Presets, open).clicked() {
-            app.ui.toggle_flyout("grading");
-        }
-        if open {
-            grading(app, ui, d, id);
+        if crate::hidden::show_all() {
+            point_and_grading(app, ui, d, id);
         }
         ui.add_space(8.0);
     });
@@ -274,34 +261,35 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
         for c in ["effects.texture", "effects.clarity", "effects.dehaze"] {
             control(app, ui, d, c, true);
         }
-        sub_title(ui, crate::i18n::tr("Vignette"));
-        {
-            use lightcraft_develop::VignetteStyle as V;
-            let styles = [
-                (V::HighlightPriority, "Highlight", "highlightPriority"),
-                (V::ColorPriority, "Color", "colorPriority"),
-                (V::PaintOverlay, "Paint", "paintOverlay"),
-            ];
-            let items: Vec<(&str, &str)> = styles.iter().map(|(_, l, k)| (*l, *k)).collect();
-            let active = styles.iter().position(|(v, _, _)| *v == d.vignette.style);
-            let mut chosen = None;
-            egui::Frame::NONE.inner_margin(egui::Margin { left: 24, right: 22, top: 2, bottom: 4 }).show(ui, |ui| {
-                chosen = crate::widgets::segmented(ui, "vignetteStyle", &items, active, 3);
-            });
-            if let Some(i) = chosen {
-                let _ = app.run(
-                    "develop.merge",
-                    serde_json::json!({"settings": {"vignette": {"style": serde_json::to_value(styles[i].0).unwrap_or_default()}}}),
-                );
+        if crate::hidden::show_all() {
+            sub_title(ui, crate::i18n::tr("Vignette"));
+            {
+                use lightcraft_develop::VignetteStyle as V;
+                let styles = [
+                    (V::HighlightPriority, "Highlight", "highlightPriority"),
+                    (V::ColorPriority, "Color", "colorPriority"),
+                    (V::PaintOverlay, "Paint", "paintOverlay"),
+                ];
+                let items: Vec<(&str, &str)> = styles.iter().map(|(_, l, k)| (*l, *k)).collect();
+                let active = styles.iter().position(|(v, _, _)| *v == d.vignette.style);
+                let mut chosen = None;
+                egui::Frame::NONE.inner_margin(egui::Margin { left: 24, right: 22, top: 2, bottom: 4 }).show(ui, |ui| {
+                    chosen = crate::widgets::segmented(ui, "vignetteStyle", &items, active, 3);
+                });
+                if let Some(i) = chosen {
+                    let _ = app.run(
+                        "develop.merge",
+                        serde_json::json!({"settings": {"vignette": {"style": serde_json::to_value(styles[i].0).unwrap_or_default()}}}),
+                    );
+                }
+            }
+            for c in ["vignette.amount", "vignette.midpoint", "vignette.feather", "vignette.roundness", "vignette.highlights"] {
+                let enabled = c == "vignette.amount" || d.vignette.amount != 0.0;
+                control(app, ui, d, c, enabled);
             }
         }
-        for c in ["vignette.amount", "vignette.midpoint", "vignette.feather", "vignette.roundness", "vignette.highlights"] {
-            let enabled = c == "vignette.amount" || d.vignette.amount != 0.0;
-            control(app, ui, d, c, enabled);
-        }
-        sub_title(ui, crate::i18n::tr("Grain"));
-        for c in ["grain.amount", "grain.size", "grain.roughness"] {
-            control(app, ui, d, c, c == "grain.amount" || d.grain.amount != 0.0);
+        if crate::hidden::show_all() {
+            grain(app, ui, d);
         }
         ui.add_space(8.0);
     });
@@ -317,10 +305,18 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
         super::denoise::detail_toggle(app, ui, id, on, applicable);
         control(app, ui, d, "enhance.denoise", applicable && on);
         super::denoise::detail_status(app, ui, id, if on { d.enhance.denoise } else { 0.0 });
-        sub_title(ui, crate::i18n::tr("Noise Reduction"));
-        for c in ["detail.nrLuminance", "detail.nrDetail", "detail.nrContrast", "detail.nrColor", "detail.nrColorDetail", "detail.nrColorSmoothness"]
-        {
-            control(app, ui, d, c, true);
+        if crate::hidden::show_all() {
+            sub_title(ui, crate::i18n::tr("Noise Reduction"));
+            manual_noise_reduction(app, ui, d);
+        } else {
+            // beside AI Denoise, tucked: the older manual sliders open on request
+            let open = app.ui.flyout_open("manualNr");
+            if flyout_row(ui, "manualNr", crate::i18n::tr("Manual Noise Reduction"), Icon::Sliders, open).clicked() {
+                app.ui.toggle_flyout("manualNr");
+            }
+            if open {
+                manual_noise_reduction(app, ui, d);
+            }
         }
         ui.add_space(8.0);
     });
@@ -352,39 +348,105 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
         }
         control(app, ui, d, "optics.vignettingMidpoint", d.optics.vignetting != 0.0);
         ui.add_space(6.0);
-        let open = app.ui.flyout_open("defringe");
-        if flyout_row(ui, "defringe", crate::i18n::tr("Defringe"), Icon::Picker, open).clicked() {
-            app.ui.toggle_flyout("defringe");
-        }
-        if open {
-            control(app, ui, d, "optics.defringePurple", true);
-            let on = d.optics.defringe_purple_amount > 0.0;
-            control(app, ui, d, "optics.defringePurpleHueLo", on);
-            control(app, ui, d, "optics.defringePurpleHueHi", on);
-            control(app, ui, d, "optics.defringeGreen", true);
-            let on = d.optics.defringe_green_amount > 0.0;
-            control(app, ui, d, "optics.defringeGreenHueLo", on);
-            control(app, ui, d, "optics.defringeGreenHueHi", on);
-            sub_title(ui, crate::i18n::tr("Lateral Chromatic Aberration"));
-            control(app, ui, d, "optics.caRed", true);
-            control(app, ui, d, "optics.caBlue", true);
+        if crate::hidden::show_all() {
+            defringe(app, ui, d);
         }
         ui.add_space(8.0);
     });
     // Lightroom Classic's Calibration panel (the cloud app hides it): last, like there.
-    section(app, ui, &d, "calibration", "Calibration", |app, ui, d| {
-        sub_title(ui, crate::i18n::tr("Shadows"));
-        control(app, ui, d, "calibration.shadowsTint", true);
-        for (title, k) in [("Red Primary", "red"), ("Green Primary", "green"), ("Blue Primary", "blue")] {
-            sub_title(ui, title);
-            control(app, ui, d, &format!("calibration.{k}Hue"), true);
-            control(app, ui, d, &format!("calibration.{k}Sat"), true);
-        }
-        ui.add_space(8.0);
-    });
+    if crate::hidden::show_all() {
+        section(app, ui, &d, "calibration", "Calibration", |app, ui, d| {
+            calibration(app, ui, d);
+            ui.add_space(8.0);
+        });
+    } else {
+        more(app, ui, &d, id);
+    }
     ui.add_space(40.0);
     // A pending numeric edit commits on blur before the explicit Reset takes precedence.
     if reset_clicked {
         let _ = app.run("develop.reset", json!({}));
     }
+}
+
+/// Point Color and Color Grading: second-tier colour tools (under More on the clean screen).
+fn point_and_grading(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings, id: PhotoId) {
+    if !crate::is_bw(d) {
+        let open = app.ui.flyout_open("pointColor");
+        if flyout_row(ui, "pointColor", crate::i18n::tr("Point Color"), Icon::Picker, open).clicked() {
+            app.ui.toggle_flyout("pointColor");
+        }
+        if open {
+            point_color(app, ui, d);
+        }
+    }
+    let open = app.ui.flyout_open("grading");
+    if flyout_row(ui, "grading", crate::i18n::tr("Color Grading"), Icon::Presets, open).clicked() {
+        app.ui.toggle_flyout("grading");
+    }
+    if open {
+        grading(app, ui, d, id);
+    }
+}
+
+fn grain(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings) {
+    sub_title(ui, crate::i18n::tr("Grain"));
+    for c in ["grain.amount", "grain.size", "grain.roughness"] {
+        control(app, ui, d, c, c == "grain.amount" || d.grain.amount != 0.0);
+    }
+}
+
+fn manual_noise_reduction(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings) {
+    for c in ["detail.nrLuminance", "detail.nrDetail", "detail.nrContrast", "detail.nrColor", "detail.nrColorDetail", "detail.nrColorSmoothness"] {
+        control(app, ui, d, c, true);
+    }
+}
+
+fn defringe(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings) {
+    let open = app.ui.flyout_open("defringe");
+    if flyout_row(ui, "defringe", crate::i18n::tr("Defringe"), Icon::Picker, open).clicked() {
+        app.ui.toggle_flyout("defringe");
+    }
+    if open {
+        control(app, ui, d, "optics.defringePurple", true);
+        let on = d.optics.defringe_purple_amount > 0.0;
+        control(app, ui, d, "optics.defringePurpleHueLo", on);
+        control(app, ui, d, "optics.defringePurpleHueHi", on);
+        control(app, ui, d, "optics.defringeGreen", true);
+        let on = d.optics.defringe_green_amount > 0.0;
+        control(app, ui, d, "optics.defringeGreenHueLo", on);
+        control(app, ui, d, "optics.defringeGreenHueHi", on);
+        sub_title(ui, crate::i18n::tr("Lateral Chromatic Aberration"));
+        control(app, ui, d, "optics.caRed", true);
+        control(app, ui, d, "optics.caBlue", true);
+    }
+}
+
+fn calibration(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings) {
+    sub_title(ui, crate::i18n::tr("Shadows"));
+    control(app, ui, d, "calibration.shadowsTint", true);
+    for (title, k) in [("Red Primary", "red"), ("Green Primary", "green"), ("Blue Primary", "blue")] {
+        sub_title(ui, title);
+        control(app, ui, d, &format!("calibration.{k}Hue"), true);
+        control(app, ui, d, &format!("calibration.{k}Sat"), true);
+    }
+}
+
+/// The clean screen's second tier, collapsed until asked for (and remembered): Color Grading,
+/// Point Color, Grain, Defringe and lateral CA, Calibration.
+fn more(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings, id: PhotoId) {
+    let open = app.ui.flyout_open("more");
+    if flyout_row(ui, "more", crate::i18n::tr("More"), Icon::More, open).clicked() {
+        app.ui.toggle_flyout("more");
+    }
+    if !open {
+        return;
+    }
+    point_and_grading(app, ui, d, id);
+    grain(app, ui, d);
+    ui.add_space(6.0);
+    defringe(app, ui, d);
+    sub_title(ui, crate::i18n::tr("Calibration"));
+    calibration(app, ui, d);
+    ui.add_space(8.0);
 }
