@@ -90,3 +90,40 @@ signing identity is signed but not notarized. Configure only the platform creden
 
 Linux and web artifacts are not code-signed by this workflow. The release job computes SHA-256
 checksums for the complete artifact set and attaches the checksum file to the draft release.
+
+Panoptic (this fork's app, based on LightCraft by the ArtCraft team) is released through Cargo Bay, not
+GitHub. Testers install it from the Mothership's Tools page, and the app updates itself. Releases are
+made on the Mac Mini with `scripts/release-mac.sh`. (Upstream's own packaging, `packaging/macos/package.sh`,
+still builds the full LightCraft DMG and is not used for Panoptic.)
+
+## Panoptic on Cargo Bay (macOS, from the Mini)
+
+**Once per Mini:** `~/.cargo-bay/release-keys/` holds the Mini's release key (`release-signing-rk-….key`,
+mode 600, named in the master-signed key list) and `publish-key` (mode 600, the publish key whose hash is
+Cargo Bay's `CARGO_BAY_PUBLISH_KEY_HASH`). Neither file ever leaves the Mini or goes into a repo. A
+cargo-bay checkout sits at `~/Eccentric-Executioners-code/cargo-bay` (or set `CARGO_BAY_DIR`). The
+catalogue must have the `panoptic` tool row (`_WORKFLOW/app-panoptic/handoffs/batch-C-catalogue-panoptic.sql`).
+
+**Each release:**
+
+1. `cargo xtask version set 0.1.1`, then commit `Cargo.toml` and `Cargo.lock`.
+2. `bash scripts/release-mac.sh 0.1.1 --dry-run`: every gate prints PASS and nothing is sent.
+3. `bash scripts/release-mac.sh 0.1.1 --notes "What's new"`.
+4. Open the tool page it prints. The new version is live; linked copies pick it up at their next check.
+
+The script refuses tracked changes, a version that differs from `Cargo.toml`, and a tag that already
+exists. It builds the app alone with the `release-slim` profile (stripped, no `lightcraft-cli`), lays out
+`Panoptic.app` (the executable is `Panoptic`, the plist is `packaging/macos/Panoptic.Info.plist.in`, the
+icon `assets/app-icon/panoptic.icns`), signs the whole bundle ad-hoc, and commits it to a one-off git
+repo in `~/panoptic-releases/<version>/stage`. Cargo Bay's release tool (`tools/release.mjs`) zips that
+tag with `git archive`, so the zip holds exactly one top-level `Panoptic.app/`, and signs the manifest
+with the Mini's release key. Five gates then check the zip (one top-level `Panoptic.app`; the executable
+after unzip; `codesign --verify --deep --strict`; the `panoptic-uplink` crate's own zip rules; under
+50 MB). Then it sends the release and tags the fork `panoptic-v<version>`. Versions are never reused, so
+a failed release takes the next number. Numbering is Panoptic's own, from 0.1.0. The build is Apple
+silicon (arm64) only and is not notarised: a tester clicks **Open Anyway** once, and updates after that
+open without asking.
+
+Switches: `PANOPTIC_NO_UPDATE=1` turns the updater off; it is also off outside a `.app`, and with
+`LIGHTCRAFT_NO_PREFS`. `PANOPTIC_CARGO_BAY_URL` and `PANOPTIC_CARGO_BAY_STATE_DIR` point a test copy at a
+local server (tests use `127.0.0.1` only).
