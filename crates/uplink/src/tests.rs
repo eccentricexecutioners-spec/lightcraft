@@ -454,6 +454,24 @@ fn pending_update_swaps_in_and_backs_up_old_bundle() {
     assert_eq!(finish_pending(&cfg.state, &cfg.trust, &bundle, "2.0.0"), StartOutcome::NothingPending);
 }
 
+/// C1-P8 (D3-P9's measurement again): the app a tester opened from a browser download carries
+/// `com.apple.quarantine`; the copy the updater swaps in does not, and nothing in it does.
+#[test]
+#[cfg(target_os = "macos")]
+fn swapped_in_bundle_carries_no_quarantine_mark() {
+    let quarantined = |bundle: &Path| {
+        let out = std::process::Command::new("xattr").arg("-rl").arg(bundle).output().unwrap();
+        String::from_utf8_lossy(&out.stdout).matches("com.apple.quarantine").count()
+    };
+    let (_tmp, cfg, bundle, _server) = staged("2.0.0", "new build");
+    let mark = "0083;00000000;Safari;";
+    assert!(std::process::Command::new("xattr").args(["-w", "com.apple.quarantine", mark]).arg(&bundle).status().unwrap().success());
+    assert_eq!(quarantined(&bundle), 1, "the installed copy starts marked");
+    assert!(matches!(finish_pending(&cfg.state, &cfg.trust, &bundle, "1.0.0"), StartOutcome::Swapped { .. }));
+    assert_eq!(read_exe(&bundle), "new build");
+    assert_eq!(quarantined(&bundle), 0, "the swapped-in bundle has no quarantine mark");
+}
+
 #[test]
 fn failing_move_restores_old_bundle_and_keeps_pending() {
     let (_tmp, cfg, bundle, _server) = staged("2.0.0", "new build");
