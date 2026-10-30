@@ -230,6 +230,10 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context, blocked: bool) {
 
 /// The title of a dialog.
 fn dialog_title(app: &LightcraftApp, dlg: &Dialog) -> String {
+    crate::hidden::brand(&dialog_title_text(app, dlg))
+}
+
+fn dialog_title_text(app: &LightcraftApp, dlg: &Dialog) -> String {
     match dlg {
         Dialog::TextPrompt { title, .. } => title.as_str(),
         Dialog::NewAlbum { folder: true, .. } => "Create Folder",
@@ -1728,6 +1732,16 @@ fn about_body(app: &mut LightcraftApp, ui: &mut egui::Ui, t: &Tokens, dlg: &mut 
         1 => crate::credits::contributors_ui(app, ui),
         2 => crate::credits::models_ui(ui),
         _ => {
+            if crate::hidden::clean() {
+                ui.label(egui::RichText::new("Panoptic").font(t.semibold(20.0)).color(t.text));
+                ui.label(crate::i18n::tr_format!("Version {} — a raw photo editor.", env!("CARGO_PKG_VERSION")));
+                ui.label("Based on LightCraft by the ArtCraft team.");
+                ui.label(crate::i18n::tr_format!(
+                    "MIT OR Apache-2.0. Fonts: {} (OFL). Icons: original.",
+                    crate::theme::font_credits(app.chinese_font.is_some())
+                ));
+                return;
+            }
             ui.label(egui::RichText::new("LightCraft").font(t.semibold(20.0)).color(t.text));
             ui.label(crate::i18n::tr_format!("Version {} — a clean-room, pure-Rust photo library and raw developer.", env!("CARGO_PKG_VERSION")));
             ui.label(crate::i18n::tr_format!(

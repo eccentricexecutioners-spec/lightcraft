@@ -61,6 +61,10 @@ pub(crate) fn blocks_input(app: &LightcraftApp) -> bool {
 }
 
 pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
+    // Panoptic never contacts the upstream release feed; Cargo Bay's updater replaces this one
+    if crate::hidden::clean() {
+        return Err("Updates are off".into());
+    }
     #[cfg(not(target_arch = "wasm32"))]
     {
         app.updates_rt.check_requested = true;
@@ -78,6 +82,9 @@ pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
 }
 
 pub(crate) fn tick(app: &mut LightcraftApp, ctx: &egui::Context) {
+    if crate::hidden::clean() {
+        return;
+    }
     #[cfg(not(target_arch = "wasm32"))]
     {
         let rt = &mut app.updates_rt;
