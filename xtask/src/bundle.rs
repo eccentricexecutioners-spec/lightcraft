@@ -23,7 +23,8 @@ pub fn run(root: &Path) -> Result<(), String> {
     std::fs::copy(root.join("assets/app-icon/panoptic.icns"), app.join("Resources/Panoptic.icns")).map_err(|e| format!("copy icon: {e}"))?;
     let sha = std::env::var("LIGHTCRAFT_BUILD_SHA").unwrap_or_else(|_| "unknown".into());
     std::fs::write(app.join("Info.plist"), info_plist(env!("CARGO_PKG_VERSION"), &sha)).map_err(|e| e.to_string())?;
-    let sign = Command::new("codesign").args(["--force", "--deep", "-s", "-"]).arg(root.join("dist/Panoptic.app")).status().map_err(|e| e.to_string())?;
+    let sign =
+        Command::new("codesign").args(["--force", "--deep", "-s", "-"]).arg(root.join("dist/Panoptic.app")).status().map_err(|e| e.to_string())?;
     if !sign.success() {
         return Err("ad-hoc codesign failed".into());
     }

@@ -54,6 +54,7 @@ use serde_json::Value;
 
 pub use command_error::CommandError;
 pub use control::{ControlRequest, ControlResponse};
+pub use dialogs::cargo_bay;
 pub use dialogs::credits;
 pub use dialogs::import;
 pub use dialogs::lightroom_destination;
@@ -159,6 +160,8 @@ pub struct LightcraftApp {
     /// Warnings to show one at a time (damaged settings files…, issue #103).
     pub notices: Vec<String>,
     pub(crate) updates_rt: updates_ui::Runtime,
+    /// Cargo Bay updates (Panoptic's updater), the window and its host.
+    pub(crate) cargo_bay: cargo_bay::Runtime,
     /// Quitting was stopped to ask first: changes couldn't be saved, or tasks are running.
     pub quit_prompt: Option<QuitPrompt>,
     /// Keyboard/focus/input state for the prompt above, including its one-frame creation barrier.

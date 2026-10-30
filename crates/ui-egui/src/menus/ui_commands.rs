@@ -255,6 +255,7 @@ pub const UI_COMMANDS: &[UiCommand] = &[
     ("app.displayProfile", "Display Profile", None, ""),
     ("app.about", "About LightCraft", None, "Help"),
     ("app.checkForUpdates", "Check for Updates…", None, "Help"),
+    ("app.linkCargoBay", "Link to Cargo Bay…", None, "Help"),
     ("app.systemInfo", "System Info…", None, "Help"),
     ("app.openLogFolder", "Open Log Folder", None, "Help"),
     // the frame-rate display (`frame_rate`): a debugging aid, never saved

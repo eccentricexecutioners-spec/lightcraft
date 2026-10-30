@@ -42,6 +42,7 @@ impl LightcraftApp {
             headless_host: false,
             notices: vec![],
             updates_rt: Default::default(),
+            cargo_bay: Default::default(),
             quit_prompt: None,
             notice_input: Default::default(),
             quit_confirmed: false,

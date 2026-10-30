@@ -64,6 +64,8 @@ pub const TABLE: &[(&str, Class)] = &[
     ("ui-egui", Class::Layer(5)),
     ("mcp", Class::Layer(5)),
     ("testkit", Class::Testkit),
+    // Desktop only (network, TLS, the app-bundle swap), as Euclidean had it: kept out of the wasm set.
+    ("panoptic-uplink", Class::Layer(6)),
     // L6 apps and tooling
     ("lightcraft", Class::Exempt),
     ("cli", Class::Exempt),

@@ -323,6 +323,7 @@ const LAYOUT: &[(&str, &[&str])] = &[
             "app.openLogFolder",
             "---",
             "app.checkForUpdates",
+            "app.linkCargoBay",
             "app.about",
         ],
     ),

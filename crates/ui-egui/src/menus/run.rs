@@ -1232,6 +1232,7 @@ fn ui_commands_10(app: &mut LightcraftApp, ctx: &egui::Context, id: &str, p: &Va
             Ok(Value::Null)
         }
         "app.checkForUpdates" => crate::updates_ui::check(app),
+        "app.linkCargoBay" => crate::cargo_bay::open_link(app),
         "photo.editInPhotoCraft" => edit_in(app, ctx, p, true),
         "photo.editInExternal" => edit_in(app, ctx, p, false),
         "photo.openOriginalInExternal" => open_original_in(app, ctx, p),

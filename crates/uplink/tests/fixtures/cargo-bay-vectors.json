@@ -1,0 +1,204 @@
+{
+  "made_by": "clients/fusion-uplink/tests/make_vectors.mjs with core/signing.mjs",
+  "rows": [
+    {
+      "name": "ascii_notes",
+      "expect": true,
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d",
+      "signature": "tvfZDcVcThjLIKniq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHbCQ=="
+    },
+    {
+      "name": "non_ascii_notes",
+      "expect": true,
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "Café crème — naïve résumé; Ünïcödé “quotes” and an em dash —"
+      },
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22436166c3a9206372c3a86d6520e28094206e61c3af76652072c3a973756dc3a93b20c39c6ec3af63c3b664c3a920e2809c71756f746573e2809d20616e6420616e20656d206461736820e28094222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d",
+      "signature": "tdHdWCjwqFADSTEHo7Ji42fnQsTcheuh3eLswnrIvHIEc5kgwMSBZwQQSqocgMTb5xKgT8eFlst+wko0S6rrBw=="
+    },
+    {
+      "name": "empty_notes",
+      "expect": true,
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": ""
+      },
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d",
+      "signature": "h/VtjnWUXMoeSwwRl+MtU6XoGTIMrjOEVZrSedJkHhRZa0VjdKmNFVdghx+rjvnU5yF+DdIGPMk0b4VtN4SDAA=="
+    },
+    {
+      "name": "beta",
+      "expect": true,
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "1.0.0-beta.3",
+        "channel": "beta",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-1.0.0-beta.3.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "beta"
+      },
+      "canonical_bytes_hex": "7b226368616e6e656c223a2262657461222c2266696c65223a22467573696f6e4d6f6e6b65792d312e302e302d626574612e332e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a2262657461222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22312e302e302d626574612e33227d",
+      "signature": "v9QVquSFbLNiweUZE9m29b7nbxKpPSOLa1TH04hCPGlbZvtcNbIvJZGqtpU0y8bpNVujwvhcZy0wFdS1fKqUDw=="
+    },
+    {
+      "name": "escapes_and_astral",
+      "expect": true,
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "line1\nline2\t\"quoted\" back\\slash / slash \u0001 ctrl  del 😀   sep",
+        "min_host": "2705"
+      },
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226d696e5f686f7374223a2232373035222c226e6f746573223a226c696e65315c6e6c696e65325c745c2271756f7465645c22206261636b5c5c736c617368202f20736c617368205c7530303031206374726c207f2064656c20f09f988020e280a820736570222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d",
+      "signature": "qbMyyqRX2GQ3eHaOCjOgEXPYs/IBJ0cGJKA2q9xd7lrCpy/rrCfAyVxWO5AROPeRZlm1CF7XQIAiMnYcY87BDQ=="
+    },
+    {
+      "name": "flipped_signature_bit",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "signature": "tvfZDcVcThjLIKjiq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHbCQ==",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    },
+    {
+      "name": "flipped_manifest_byte",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48214,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "signature": "tvfZDcVcThjLIKniq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHbCQ==",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231342c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    },
+    {
+      "name": "different_key",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAFx5Aj2R17sCruLaxXTUSBwnMtDrpTQXzpgxFlF/KS68=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "signature": "tvfZDcVcThjLIKniq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHbCQ==",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    },
+    {
+      "name": "empty_signature",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "signature": "",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    },
+    {
+      "name": "truncated_signature",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words."
+      },
+      "signature": "tvfZDcVcThjLIKniq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHb",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    },
+    {
+      "name": "notes_changed",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo1gaVrW8Qw11c2fAtR/SmYwdMFOFqYclowLUxnXrzzA=\n-----END PUBLIC KEY-----\n",
+      "manifest": {
+        "tool_id": "fusion-monkey",
+        "version": "0.9.0",
+        "channel": "stable",
+        "kind": "fusion-addin",
+        "file": "FusionMonkey-0.9.0.zip",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "size": 48213,
+        "released_at": "2026-10-07T19:00:00Z",
+        "notes": "What's new, in plain words. "
+      },
+      "signature": "tvfZDcVcThjLIKniq+cUAGDjkvJO5Es/nWa9BFj0T/l2kWqZKg71ySEndQ4vx16cuJ1ob+59TTDVlafkWbHbCQ==",
+      "expect": false,
+      "canonical_bytes_hex": "7b226368616e6e656c223a22737461626c65222c2266696c65223a22467573696f6e4d6f6e6b65792d302e392e302e7a6970222c226b696e64223a22667573696f6e2d616464696e222c226e6f746573223a22576861742773206e65772c20696e20706c61696e20776f7264732e20222c2272656c65617365645f6174223a22323032362d31302d30375431393a30303a30305a222c22736861323536223a2261616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161222c2273697a65223a34383231332c22746f6f6c5f6964223a22667573696f6e2d6d6f6e6b6579222c2276657273696f6e223a22302e392e30227d"
+    }
+  ]
+}

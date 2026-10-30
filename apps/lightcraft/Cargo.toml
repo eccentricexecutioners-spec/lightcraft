@@ -16,6 +16,8 @@ rawnind-model = ["denoise", "lightcraft-engine/rawnind-model"]
 # Open HEIC/HEIF photos (the optional lightcraft-heif crate). Not default so distributors choose
 # it (HEVC patents); build with `--features heif` to include it.
 heif = ["lightcraft-codecs/heif"]
+# Trusts the uplink crate's TEST master key, for the scratch end-to-end run. Never in a release build.
+uplink-test-key = ["panoptic-uplink/uplink-test-key"]
 
 [dependencies]
 lightcraft-engine = { workspace = true, features = ["sam"] }
@@ -42,6 +44,8 @@ winit = { version = "0.30", default-features = false, features = ["x11"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rfd = { workspace = true }
+# Cargo Bay updates (Help ▸ Check for Updates, Link to Cargo Bay): linking, signed update checks, the swap at start.
+panoptic-uplink = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 zbus = { workspace = true }

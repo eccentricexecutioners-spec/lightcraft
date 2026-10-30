@@ -63,7 +63,7 @@ pub(crate) fn blocks_input(app: &LightcraftApp) -> bool {
 pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
     // Panoptic never contacts the upstream release feed; Cargo Bay's updater replaces this one
     if crate::hidden::clean() {
-        return Err("Updates are off".into());
+        return crate::cargo_bay::check(app);
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -83,6 +83,7 @@ pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
 
 pub(crate) fn tick(app: &mut LightcraftApp, ctx: &egui::Context) {
     if crate::hidden::clean() {
+        crate::cargo_bay::tick(app, ctx);
         return;
     }
     #[cfg(not(target_arch = "wasm32"))]
@@ -101,6 +102,11 @@ pub(crate) fn tick(app: &mut LightcraftApp, ctx: &egui::Context) {
 }
 
 pub(crate) fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+    // The clean screen shows Cargo Bay's window only; the upstream updater is never driven.
+    if crate::hidden::clean() {
+        crate::cargo_bay::show(app, ctx);
+        return;
+    }
     #[cfg(not(target_arch = "wasm32"))]
     {
         // The restart helper is scheduled before the app closes, so no update starts over unsaved work.

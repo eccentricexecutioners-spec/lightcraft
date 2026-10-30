@@ -44,6 +44,7 @@ lightcraft-segment = { path = "crates/segment" }
 lightcraft-geocode = { path = "crates/geocode" }
 lightcraft-slideshow = { path = "crates/slideshow" }
 lightcraft-testkit = { path = "crates/testkit" }
+panoptic-uplink = { path = "crates/uplink" }
 
 # foundation
 thiserror = "2"

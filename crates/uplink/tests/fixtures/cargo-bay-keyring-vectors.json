@@ -1,0 +1,72 @@
+{
+  "made_by": "clients/fusion-uplink/tests/make_keyring_vectors.mjs with core/keyring.mjs and core/signing.mjs",
+  "master_public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAFf9OCBtC/3UJkW7ruvMKRxn2Jo09kM6+Pfk2afVEhgM=\n-----END PUBLIC KEY-----\n",
+  "release_public_keys": {
+    "a": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\n-----END PUBLIC KEY-----\n",
+    "b": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAhoESry0zjGVvgqixZb/6wlvj0F8IWCEKoXyMoMIrlZI=\n-----END PUBLIC KEY-----\n",
+    "unlisted": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAJASZgtdQCkSBEMBDLrzJ8/tfZ324ga1DwwFjMFxbTXk=\n-----END PUBLIC KEY-----\n"
+  },
+  "key_ids": {
+    "a": "rk-20261008-aaaa",
+    "b": "rk-20261008-bbbb"
+  },
+  "lists": {
+    "good_1": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[{\"key_id\":\"rk-20261008-aaaa\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\\n-----END PUBLIC KEY-----\\n\"}],\"serial\":1,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "/IHGwfnmbxa1G8Z5CH71wuzorW+HHElskQBEP8lCwwlKYMIUvjyL/wBDpL3HVs2d7mKdTcVcuSzJyCeQe+PwCA=="
+    },
+    "two_keys_2": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[{\"key_id\":\"rk-20261008-aaaa\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\\n-----END PUBLIC KEY-----\\n\"},{\"key_id\":\"rk-20261008-bbbb\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEAhoESry0zjGVvgqixZb/6wlvj0F8IWCEKoXyMoMIrlZI=\\n-----END PUBLIC KEY-----\\n\"}],\"serial\":2,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "ONU9BIOGe4clCyJHW37Cxvcn8Y6cNrqcOgR6ieBcwZWyA6Z0wuLKx/cEsTtshlfbaHDalIgSLE1qO0vvwzoFAg=="
+    },
+    "drop_a_2": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[{\"key_id\":\"rk-20261008-bbbb\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEAhoESry0zjGVvgqixZb/6wlvj0F8IWCEKoXyMoMIrlZI=\\n-----END PUBLIC KEY-----\\n\"}],\"serial\":2,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "CcvimEpw3ORi3ajFQQG3KFK2+smGadzc1SX2filY6WHBZ/5YpQq9Mv0AqKs6/C9cYGz2z/tDJsk0c/rl6SJ+Cg=="
+    },
+    "empty_3": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[],\"serial\":3,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "KstmLMBoKYKKiEBY/8fZqlvREwj/G+S6CGyEgijY85lP2b3HIxYcVKjR7ownnpu2bWFrVspEf3ZvyhRWKp+jDw=="
+    },
+    "by_release_key_5": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[{\"key_id\":\"rk-20261008-aaaa\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\\n-----END PUBLIC KEY-----\\n\"}],\"serial\":5,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "FlwhNWv+OhBYO/9kfKpVjQqIKHBbJOd6edZ2LfzMyj7D7S4hYvuz5KhJcmbdHglmjf4NQcWLOzo7l8xrstiYAw=="
+    },
+    "tampered_1": {
+      "document": "{\"issued_at\":\"2026-10-08T19:00:00Z\",\"release_keys\":[{\"key_id\":\"rk-20261008-aaaa\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\\n-----END PUBLIC KEY-----\\n\"}],\"serial\":9,\"type\":\"cargo-bay-keyring\"}",
+      "signature": "/IHGwfnmbxa1G8Z5CH71wuzorW+HHElskQBEP8lCwwlKYMIUvjyL/wBDpL3HVs2d7mKdTcVcuSzJyCeQe+PwCA=="
+    },
+    "non_canonical_4": {
+      "document": "{\n  \"type\": \"cargo-bay-keyring\",\n  \"serial\": 4,\n  \"issued_at\": \"2026-10-08T19:00:00Z\",\n  \"release_keys\": [\n    {\n      \"key_id\": \"rk-20261008-aaaa\",\n      \"public_key\": \"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEADtsP6k0a9yFfXK2zq7zOKUAEPiUI9GDkDn71ULGjeVU=\\n-----END PUBLIC KEY-----\\n\"\n    }\n  ]\n}",
+      "signature": "qX+VTMO8mdmu7my5zNu5ziFvdW0LAuewx2ygp2On4m/F0RrFz9fFS8ADSexhC0wpkJoMlz2hiYFiDTxuJ7TpCw=="
+    }
+  },
+  "expect_valid": {
+    "good_1": true,
+    "two_keys_2": true,
+    "drop_a_2": true,
+    "empty_3": true,
+    "by_release_key_5": false,
+    "tampered_1": false,
+    "non_canonical_4": false
+  },
+  "release": {
+    "manifest": {
+      "tool_id": "fake-tool",
+      "version": "1.2.0",
+      "channel": "stable",
+      "kind": "fusion-addin",
+      "file": "FakeTool-1.2.0.zip",
+      "sha256": "222a8bd9ca1e2980a9fccf14781f92ba07b1fd63c88158e9a399268dd1751a0c",
+      "size": 328,
+      "released_at": "2026-10-08T20:00:00Z",
+      "notes": "J3 vector"
+    },
+    "signatures": {
+      "master": "r/UWTA0ioEBHceUxfyi+a4mjWXFoaBbFNGxZ7rjf4KXUuEXxafOpntZYrQZ4tbU7Eq9JKj9rSN5jtG3tnftFDw==",
+      "a": "llINAGagHxDckbOM9y5jFvaSu5cii9mi7DvbneDPZLPa4M1vtIIZ7OPi2MPg15S533c718ZCwRFxW09S7OD0DA==",
+      "b": "y8iZKH/fRZtwI92dH+JXVW/pyYLCygKYqmXB0qE7/qmM399nzZudLsGzDao9/DEYAGO1Qt+eEKGoovafN9t2AA==",
+      "unlisted": "xKwUFBHRSuR67FsxiApLG1z+uswzbEJFEzgQNvu481VIS/oM4vnqdcdV1DcM2A5ydYR65YTIZxaRL+sh20njBA=="
+    },
+    "zip_base64": "UEsDBBQAAAAAAAAASF10MmQrGAAAABgAAAAUAAAARmFrZVRvb2wvRmFrZVRvb2wucHlwcmludCgiRmFrZVRvb2wgMS4yLjAiKQpQSwMEFAAAAAAAAABIXdOZVlImAAAAJgAAABoAAABGYWtlVG9vbC9GYWtlVG9vbC5tYW5pZmVzdHsidHlwZSI6ICJhZGRpbiIsICJ2ZXJzaW9uIjogIjEuMi4wIn0KUEsBAhQAFAAAAAAAAABIXXQyZCsYAAAAGAAAABQAAAAAAAAAAAAAAKSBAAAAAEZha2VUb29sL0Zha2VUb29sLnB5UEsBAhQAFAAAAAAAAABIXdOZVlImAAAAJgAAABoAAAAAAAAAAAAAAKSBSgAAAEZha2VUb29sL0Zha2VUb29sLm1hbmlmZXN0UEsFBgAAAAACAAIAigAAAKgAAAAAAA=="
+  }
+}

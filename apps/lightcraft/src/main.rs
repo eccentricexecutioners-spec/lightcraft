@@ -116,6 +116,7 @@ impl eframe::App for App {
         if !self.0.shutdown(EXIT_WAIT) {
             log::warn!("quit: background work was still running after {EXIT_WAIT:?}");
         }
+        relaunch_if_asked();
         // macOS (#1331): end the process here, before eframe tears the window down, as Quit from
         // the menu bar already does (PR #444). AccessKit's macOS adapter subclasses the window's
         // content view and restores its class on teardown; AppKit's Touch Bar support observes
@@ -132,6 +133,116 @@ impl eframe::App for App {
 /// How long quitting waits for renders that are running (issue #620). A GPU render takes well under
 /// a second; anything slower gives way to quitting.
 const EXIT_WAIT: std::time::Duration = std::time::Duration::from_secs(2);
+
+/// Set when Restart now was pressed: [`relaunch_if_asked`] opens the new app once this one has quit.
+static RELAUNCH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+/// The app bundle to open again.
+static RELAUNCH_BUNDLE: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
+
+/// Open the updated app, if Restart now asked for it. The new process swaps the staged copy in at
+/// its start.
+fn relaunch_if_asked() {
+    if RELAUNCH.load(std::sync::atomic::Ordering::SeqCst)
+        && let Some(bundle) = RELAUNCH_BUNDLE.get()
+    {
+        match panoptic_uplink::relaunch(bundle) {
+            Ok(()) => log::info!("opening {} again to finish the update", bundle.display()),
+            Err(e) => log::warn!("could not open {} again: {e}", bundle.display()),
+        }
+    }
+}
+
+/// The Cargo Bay updater as the UI sees it ([`lightcraft_ui_egui::cargo_bay::UpdateHost`]).
+struct UpdaterHost(panoptic_uplink::Updater);
+
+impl lightcraft_ui_egui::cargo_bay::UpdateHost for UpdaterHost {
+    fn view(&self) -> lightcraft_ui_egui::cargo_bay::UpdateView {
+        let v = self.0.view();
+        lightcraft_ui_egui::cargo_bay::UpdateView {
+            linked: v.linked,
+            busy: v.busy,
+            message: v.message,
+            message_seq: v.seq,
+            ready: v.ready,
+            link_error: v.link_error,
+            installed: v.installed,
+            offered: v.offered,
+            notes: v.notes,
+            received: v.received,
+            total: v.total,
+            verifying: v.verifying,
+            up_to_date: v.up_to_date,
+            error: v.error,
+            elsewhere: v.elsewhere,
+        }
+    }
+    fn link(&mut self, code: &str) {
+        self.0.link(code);
+    }
+    fn check(&mut self) {
+        self.0.check();
+    }
+    fn restart(&mut self) {
+        RELAUNCH.store(true, std::sync::atomic::Ordering::SeqCst);
+    }
+}
+
+/// What start-up made of Cargo Bay updates, before the window.
+enum UpdateStart {
+    /// Updates are off in this run.
+    Off,
+    /// A staged update was swapped in and the new app opened: this process ends.
+    Relaunched,
+    On {
+        updater: panoptic_uplink::Updater,
+    },
+}
+
+/// Finish a staged update (macOS) and build the updater, unless updates are off (a development
+/// run, `PANOPTIC_NO_UPDATE=1`, a run without preferences, a memory session, the full app).
+fn start_updates(headless: bool) -> UpdateStart {
+    use panoptic_uplink::{Config, StartOutcome, Updater};
+    // The full app (PANOPTIC_SHOW_ALL) keeps upstream's updater, which is off in Panoptic builds.
+    if lightcraft_ui_egui::hidden::show_all() {
+        return UpdateStart::Off;
+    }
+    let exe = match std::env::current_exe() {
+        Ok(exe) => exe,
+        Err(e) => {
+            log::info!("updates are off: {e}");
+            return UpdateStart::Off;
+        }
+    };
+    if let Some(why) = panoptic_uplink::off_reason(headless, &exe) {
+        log::info!("updates are off: {why}");
+        return UpdateStart::Off;
+    }
+    let cfg = Config::from_env(env!("CARGO_PKG_VERSION"));
+    if cfg!(target_os = "macos")
+        && let Some(bundle) = panoptic_uplink::current_bundle(&exe)
+    {
+        match panoptic_uplink::finish_pending(&cfg.state, &cfg.trust, &bundle, &cfg.installed_version) {
+            StartOutcome::NothingPending => {}
+            StartOutcome::Swapped { from, to } => {
+                log::info!("update swapped in: {from} -> {to}");
+                match panoptic_uplink::relaunch(&bundle) {
+                    Ok(()) => return UpdateStart::Relaunched,
+                    // The new version is in place; this run goes on.
+                    Err(e) => log::warn!("could not open the updated app: {e}"),
+                }
+            }
+            StartOutcome::VerifyFailed(why) => log::warn!("staged update failed its check: {why}"),
+            StartOutcome::InstallFailed(why) => log::warn!("staged update could not be installed: {why}"),
+            StartOutcome::Unreadable(why) => log::warn!("staged update could not be read: {why}"),
+        }
+        if let Some((new, old)) = panoptic_uplink::unshown_update(&cfg.state) {
+            log::info!("updated to {new} (was {old})");
+            panoptic_uplink::swap::mark_shown(&cfg.state);
+        }
+        let _ = RELAUNCH_BUNDLE.set(bundle);
+    }
+    UpdateStart::On { updater: Updater::new(cfg) }
+}
 
 fn main() -> eframe::Result {
     // Windows: the update helper is a copy of this program started with `--finish-update`.
@@ -196,6 +307,11 @@ fn main() -> eframe::Result {
     // what the arguments name, resolved now: an empty or relative argument never becomes a drive
     // root, and a whole drive or home folder is not walked (issue #374)
     let (files, launch_notices) = launch_imports(&files);
+    // A staged Cargo Bay update is swapped in before any window: the new app opens and this one ends.
+    let updates = match start_updates(in_memory) {
+        UpdateStart::Relaunched => return Ok(()),
+        other => other,
+    };
     let (prefs, prefs_warning, keep_prefs_file) = load_prefs(in_memory);
     // the saved language from the start, so a failed start is reported in it too
     if let Some(ui) = &prefs {
@@ -271,6 +387,15 @@ fn main() -> eframe::Result {
                 hdr_display::report(cc.wgpu_render_state.as_ref().map(|r| r.target_format));
                 let mut app = LightcraftApp::new(session, services(cc, app_log_file.as_deref()));
                 app.set_startup_update_check(true);
+                if let UpdateStart::On { updater } = updates {
+                    let ctx = cc.egui_ctx.clone();
+                    updater.set_on_change(move || ctx.request_repaint());
+                    // A linked copy looks for an update as it starts, on a thread of its own.
+                    if updater.view().linked {
+                        updater.check();
+                    }
+                    app.set_update_host(Box::new(UpdaterHost(updater)));
+                }
                 if let Some(ui) = prefs {
                     app.ui = ui;
                 }

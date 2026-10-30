@@ -1,0 +1,32 @@
+[package]
+name = "panoptic-uplink"
+description = "Cargo Bay uplink: link this copy, check for a signed update, stage it, swap it in at start"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# Adds a TEST master key to the trusted keys. Never on in a release build.
+uplink-test-key = []
+
+[dependencies]
+ureq = { version = "3", default-features = false, features = ["rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rustls-native-certs = "0.8"
+ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
+zip = { version = "9", default-features = false, features = ["deflate-flate2"] }
+flate2 = "1"
+crc32fast = { workspace = true }
+sha2 = "0.10"
+base64 = "0.22"
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"

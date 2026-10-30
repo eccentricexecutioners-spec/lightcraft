@@ -82,9 +82,9 @@ pub const TABLE: &[Entry] = &[
     ),
     entry!("About dialog promotion (Discord button, more creative apps)", "`dialogs.rs` About", "ArtCraft promotion"),
     entry!(
-        "Updater: startup prompt, Check for Updates, self-update",
-        "`app/frame.rs`, `dialogs/updates_ui.rs`, `apps/lightcraft/src/main.rs`",
-        "Would offer ArtCraft's builds; off until Cargo Bay's updater is wired in"
+        "Updater: upstream's (craft-update) startup prompt and self-update; Panoptic's own Cargo Bay updater is shown (Help ▸ Check for Updates, Link to Cargo Bay)",
+        "`dialogs/updates_ui.rs`, `dialogs/cargo_bay.rs`, `apps/lightcraft/src/main.rs`",
+        "Upstream's would offer ArtCraft's builds; never called on the clean screen"
     ),
 ];
 
@@ -179,7 +179,6 @@ const COMMANDS: &[&str] = &[
     "app.artcraft",
     "app.help",
     "app.whatsNew",
-    "app.checkForUpdates",
     "photo.tagFromTracklog",
     "panel.keywords",
     "panel.addKeywords",

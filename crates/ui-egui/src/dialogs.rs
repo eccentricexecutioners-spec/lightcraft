@@ -33,6 +33,7 @@ pub(crate) use sam_model::show_model_folder;
 use sam_model::{sam_by_hand, sam_model_body};
 use slideshow_export::slideshow_export_body;
 
+pub mod cargo_bay;
 pub mod credits;
 pub mod faces;
 pub mod import;
