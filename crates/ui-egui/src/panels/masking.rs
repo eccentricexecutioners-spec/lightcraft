@@ -660,6 +660,25 @@ fn range_controls(app: &mut LightcraftApp, ui: &mut egui::Ui, comp: usize, shape
                 app.run("mask.update", json!({"component": comp, "shape": MaskShape::ColorRange { samples: samples.clone(), refine: v }}))
             });
         }
+        // a feather that can be changed after the mask is made, as Adobe's radial gradient has
+        MaskShape::Radial { center, rx, ry, angle, feather, invert } => {
+            let (center, rx, ry, angle, invert) = (*center, *rx, *ry, *angle, *invert);
+            let spec = ControlSpec {
+                id: "ui.maskRadialFeather",
+                label: "Feather",
+                section: Section::Light,
+                min: 0.0,
+                max: 100.0,
+                default: 50.0,
+                step: 1.0,
+                decimals: 0,
+                track: Track::Plain,
+            };
+            let out = slider(ui, &spec, *feather, true, None);
+            apply_slider_out(app, &spec, out, |app, v| {
+                app.run("mask.update", json!({"component": comp, "shape": MaskShape::Radial { center, rx, ry, angle, feather: v, invert }}))
+            });
+        }
         _ => {}
     }
 }

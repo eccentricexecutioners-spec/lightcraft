@@ -1909,3 +1909,20 @@ fn effect_dropdown_applies_saves_and_shows_the_matching_effect() {
     assert_eq!((a.exposure, a.shadows, a.clarity, a.amount), (0.7, 25.0, 0.0, 50.0));
     assert_eq!(exec(&mut h, "mask.effects", json!({}))["current"], "Lift");
 }
+
+#[test]
+fn a_radial_masks_feather_can_be_changed_after_it_is_made() {
+    let mut h = detail("panel.masking");
+    exec(&mut h, "mask.add", json!({"kind": "radial", "feather": 50.0}));
+    let shape = |h: &Headless| match &develop(h).masks[0].components[0].shape {
+        MaskShape::Radial { feather, .. } => *feather,
+        other => panic!("not radial: {other:?}"),
+    };
+    assert_eq!(shape(&h), 50.0);
+    let MaskShape::Radial { center, rx, ry, angle, invert, .. } = develop(&h).masks[0].components[0].shape.clone() else { panic!("not radial") };
+    exec(&mut h, "mask.update", json!({"component": 0, "shape": MaskShape::Radial { center, rx, ry, angle, feather: 80.0, invert }}));
+    assert_eq!(shape(&h), 80.0);
+    // the panel draws the Feather control for the radial component
+    let r = h.request("ui.inspect", json!({}), T);
+    assert_eq!(r["ok"], true, "{r}");
+}
