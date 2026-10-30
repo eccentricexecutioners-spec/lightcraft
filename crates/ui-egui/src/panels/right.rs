@@ -53,7 +53,11 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
             let r = ui.max_rect();
             // every tab (Edit, Info, Versions…) says it: nothing to show until photos come in
             if super::empty_library::shown(&app.session) {
-                super::empty_message(ui, r, "No photos yet", "Import photos to get started");
+                if crate::hidden::clean() {
+                    super::empty_message(ui, r, "No photo open", "Open a photo to edit it");
+                } else {
+                    super::empty_message(ui, r, "No photos yet", "Import photos to get started");
+                }
             } else {
                 super::empty_message(ui, r, "No photo selected", "Select a photo to edit");
             }
