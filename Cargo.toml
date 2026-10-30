@@ -3,7 +3,7 @@ resolver = "3"
 members = ["crates/*", "apps/*", "xtask"]
 
 [workspace.package]
-version = "0.15.0"
+version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -141,6 +141,13 @@ debug = "line-tables-only"
 
 [profile.release]
 debug = "line-tables-only"
+
+# The Panoptic release zip (scripts/release-mac.sh): stripped, so the zip stays under Cargo Bay's 50 MB upload limit.
+[profile.release-slim]
+inherits = "release"
+debug = false
+strip = true
+lto = "thin"
 
 [profile.dist]
 inherits = "release"

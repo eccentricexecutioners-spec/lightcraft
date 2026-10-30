@@ -5,6 +5,7 @@
 
 mod assets;
 mod bench;
+mod bundle;
 mod ci_lock;
 mod ci_quick;
 mod ci_report;
@@ -36,6 +37,7 @@ commands:
   bench [FILE] [--strict] [--threshold PCT]
                   run the render benchmark, append to target/bench/history.jsonl, compare CPU time with
                   the previous run (default input: corpus/raw/arw-sony-a7m3-compressed.arw)
+  bundle          build dist/Panoptic.app (macOS, ad-hoc signed) with assets/app-icon/panoptic.icns
   ico <out.ico> <in.png>...
                   pack square PNGs (<= 256 px) into a Windows .ico (see packaging/icons.sh)
   layers          enforce the crate dependency layering (plan/architecture.md §3)
@@ -73,6 +75,7 @@ fn main() -> ExitCode {
     let rest: Vec<&str> = args.iter().skip(1).map(String::as_str).collect();
     let result = match args.first().map(String::as_str) {
         Some("ico") => ico::run(&rest),
+        Some("bundle") => bundle::run(&root()),
         Some("version") => version::run(&root(), &rest),
         Some("layers") => cmd_layers(),
         Some("assets") => assets::run(&root()),
